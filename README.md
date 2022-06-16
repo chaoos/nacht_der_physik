@@ -79,3 +79,6 @@ original call to findContours():
 
     dots, hierarchy = cv2.findContours(image['dots'], cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE) # find dots
 
+original call to drawContours():
+
+    cv2.drawContours(image['output'], dots_in_rect, -1, dot_color, cv2.FILLED)

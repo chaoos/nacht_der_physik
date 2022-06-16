@@ -174,11 +174,11 @@
                     "active": true,
                     "method": "inRange",
                     "args": [
-                        // these values are given in RGB
+                        // these values are given in BGR
                         {"item": [0, 70, 0], "__type__": "tuple"}, // lower
                         {"item": [255, 255, 255], "__type__": "tuple"} // upper
                     ],
-                    "__comment__": "paint white all that is between the RGB values above"
+                    "__comment__": "paint white all that is between the BGR values above"
                 },
                 "morphologyEx": {
                     "active": false,
@@ -218,7 +218,7 @@
                 // the list. All dots that are recognized are drawn red in
                 // the resulting picture.
                 "contourArea": {
-                    "active": true,
+                    "active": false,
                     "method": "contourArea",
                     "expression": "1 < np.sqrt({0}/np.pi) < 15",
                     "__comment__": "filtering the dots by radius"
@@ -236,13 +236,13 @@
         "fancy": true,
 
         // calculate pi by the area covered by the points rather than the number of distict #points
-        "area": true,
+        "area": false,
 
         // delay after each cycle in seconds
         "delay": 2,
 
         // enable debugging (prints a lot of messages to stdout).
-        "debug": false,
+        "debug": true,
 
         // no more that max_circles circles are processed
         "max_circles": 2,
@@ -270,11 +270,43 @@
             },
         },
 
+        // no more that max_dots dots are processed
+        "max_dots": 10000,
+
+        // possible values: draw, detect
+        // All dots that are detected or drawn are visible in the output
+        // picture in red.
+        "dots": ["detect"],
+
+        // Draw dots of size 1 pixel (area = 0) The first value in the size
+        // tuple is the number of dots we want to generate. Notice that the
+        // dots are only one pixel, thus barely visible in the picture.
+        "draw_dots": {
+            "method": "np.random.randint",
+            "args": [],
+            "kwargs": {
+                "low": 0,
+                "high": 640, // the higher one from the resolution 640x480
+                "size": {"item": [10000,1,1,2], "__type__": "tuple"},
+                "dtype": {"item": "int", "__type__": "constant"}
+            }
+        },
+
         // Parameter for the call of cv2.findContours() to detect contours automatically
         "detect_dots": {
             "args": [
                 {"item": "cv2.RETR_LIST", "__type__": "constant"},
                 {"item": "cv2.CHAIN_APPROX_SIMPLE", "__type__": "constant"}
+            ],
+            "kwargs": {},
+        },
+
+        // Parameter for the call of cv2.drawContours() to detect contours automatically
+        "draw_contours": {
+            "args": [
+                -1,
+                {"item": [0, 0, 255], "__type__": "tuple"}, // BGR, red
+                {"item": -1, "__type__": "constant"} // cv.FILLED = -1
             ],
             "kwargs": {},
         }

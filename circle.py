@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import numpy as np
+import numpy.random
 import argparse
 import cv2
 import os
@@ -174,10 +175,27 @@ if __name__ == "__main__":
         #output = cv2.drawKeypoints(output, keypoints, np.array([]), dot_color, cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
 
         #th, threshed = cv2.threshold(gray2, 100, 255, cv2.THRESH_BINARY|cv2.THRESH_OTSU) # threshold for the dots
-        pargs = data.config.detect_dots['args']
-        kwargs = data.config.detect_dots['kwargs']
-        logger.info(f"dots/findContours: calling findContours with {pargs = } and {kwargs = }")
-        dots, hierarchy = cv2.findContours(image['dots'], *pargs, **kwargs) # find dots
+        dots = []
+        if 'draw' in data.config.dots:
+            pargs = data.config.draw_dots['args']
+            kwargs = data.config.draw_dots['kwargs']
+            logger.info(f"dots/draw: applying {data.config.draw_dots['method']} with {pargs = } and {kwargs = }")
+            draw_dots = eval('{0}(*pargs, **kwargs)'.format(data.config.draw_dots['method']))
+            draw_dots = draw_dots[0:data.config.max_dots]
+            dots.extend(draw_dots)
+            logger.debug(f"{len(draw_dots) = }")
+
+        if 'detect' in data.config.dots:
+            pargs = data.config.detect_dots['args']
+            kwargs = data.config.detect_dots['kwargs']
+            logger.info(f"dots/detect: calling findContours with {pargs = } and {kwargs = }")
+            detect_dots, hierarchy = cv2.findContours(image['dots'], *pargs, **kwargs) # find dots
+            dots.extend(detect_dots)
+            logger.debug(f"{len(detect_dots) = }")
+
+        logger.debug(f"{len(dots) = }")
+        #logger.debug(f"{detected_dots = }")
+
         #dots = list(filter(lambda x: cv2.contourArea(x) in dots_filter_area, dots)) # filter dots by area
         #cv2.drawContours(output, dots, -1, dot_color, 3) # draw remaining dots
 
@@ -227,7 +245,7 @@ if __name__ == "__main__":
                 cv2.rectangle(image['output'], (x - 2, y - 2), (x + 2, y + 2), circle_center_color, cv2.FILLED)
                 cv2.rectangle(image['output'], (x - r, y - r), (x + r, y + r), rectangle_color, rectangle_thickness)
 
-                for dot in dots:
+                for dot in dots[0:data.config.max_dots]:
                     pt = dot[0,0]
                     if pt_in_circle(pt, ((x,y),r)):
                         pts_in_circ[i] += 1
@@ -236,8 +254,12 @@ if __name__ == "__main__":
                         pts_in_rect[i] += 1
                         area_in_rect[i] += cv2.contourArea(dot)
 
-                dots_in_rect = list(filter(lambda dot: pt_in_rectangle(dot[0,0], ((x-r,y-r),(x+r,y+r))), dots)) # only dots in the rectangle
-                cv2.drawContours(image['output'], dots_in_rect, -1, dot_color, cv2.FILLED) # draw remaining dots
+                # only dots in the rectangle
+                dots_in_rect = list(filter(lambda dot: pt_in_rectangle(dot[0,0], ((x-r,y-r),(x+r,y+r))), dots[0:data.config.max_dots]))
+                pargs = data.config.draw_contours['args']
+                kwargs = data.config.draw_contours['kwargs']
+                logger.info(f"dots/draw: drawing dots with drawContours with {pargs = } and {kwargs = }")
+                cv2.drawContours(image['output'], dots_in_rect, *pargs, **kwargs) # draw remaining dots
                 cv2.fillPoly(image['dots'], pts=dots_in_rect, color=(0,0,0))
 
                 store_pi_area.append(4*area_in_circ[i]/area_in_rect[i] if area_in_rect[i] != 0 else None)
@@ -279,7 +301,9 @@ if __name__ == "__main__":
 
         with open(args.outfile, 'w') as f:
             logger.debug(f"Storing json in {args.outfile}")
-            commentjson.dump({k: list(v) for k, v in store.items()}, f, indent=4)
+            output_json = {k: list(v) for k, v in store.items()}
+            output_json['area'] = data.config.area
+            commentjson.dump(output_json, f, indent=4)
 
         if cv2.waitKey(1) & 0xFF == ord('q'):
             logger.info("quitting")

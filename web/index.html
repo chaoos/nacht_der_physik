@@ -55,14 +55,22 @@ $( document ).ready(function() {
 
   setInterval(function() {
     eel.get_json('web/output.json')(function(json){
-      var pi = average(json.pi_area[json.pi_area.length - 1]).toFixed(4);
+      if (json.area) {
+        var pi = average(json.pi_area[json.pi_area.length - 1]).toFixed(4);
+      } else {
+        var pi = average(json.pi_pts[json.pi_pts.length - 1]).toFixed(4);
+      }
       console.log(pi);
       var pts_in_rect = sum(json.pts_in_rect[json.pts_in_rect.length - 1]);
       var pts_in_circ = sum(json.pts_in_circ[json.pts_in_circ.length - 1]);
       var area_in_rect = sum(json.area_in_rect[json.area_in_rect.length - 1]);
       var area_in_circ = sum(json.area_in_circ[json.area_in_circ.length - 1]);
       var chart = $('#container').highcharts();
-      var data = json.timestamp.map((value,key) => {return {x:value,y:average(json.pi_area[key])}})
+      if (json.area) {
+        var data = json.timestamp.map((value,key) => {return {x:value,y:average(json.pi_area[key])}})
+      } else {
+        var data = json.timestamp.map((value,key) => {return {x:value,y:average(json.pi_pts[key])}})
+      }
       $('#pi').html(pi);
       $('#pts_in_rect').html(pts_in_rect);
       $('#pts_in_circ').html(pts_in_circ);
