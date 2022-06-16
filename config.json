@@ -1,0 +1,282 @@
+{
+    "images": {
+        //
+        // one entry for every image that is processed
+        // every entry contains a "methods" list and may contain a filter list
+        // every entry in the methods list has a name
+        // image.methods.name.active: whether this method is invoked or not
+        // image.methods.name.method: the name of the opencv method to call upon the image
+        // image.methods.name.args: positional arguments to call the method with
+        // image.methods.name.kwargs: keyword arguments to call the method with
+        // image.methods.name.__comment__: a comment that is printed in the terminal
+        //
+        // image.filters.name.active: whether this filter is processed or not
+        // image.filters.name.method: the name of the opencv method to call upon the list
+        // image.filters.name.expression: an expression to evaluate upon the list, item that pass the test are kept
+        // image.filters.name.__comment__: a comment that is printed in the terminal
+        //
+        // image.show: whether to display the image or not
+        // image.store: a path where to store the image
+        //
+        "circle": {
+            "methods": {
+                "cvtColor": {
+                    "active": true,
+                    "method": "cvtColor",
+                    "args": [
+                        {"item": "cv2.COLOR_BGR2GRAY", "__type__": "constant"}
+                    ]
+                },
+                "GaussianBlur": {
+                    "active": true,
+                    "method": "GaussianBlur",
+                    "args": [
+                        {"item": [5,5], "__type__": "tuple"}, 0
+                    ],
+                    "__comment__": "apply GuassianBlur to reduce noise"
+                },
+                "medianBlur": {
+                    "active": true,
+                    "method": "medianBlur",
+                    "args": [ 5 ],
+                    "__comment__": "medianBlur is also added for smoothening, reducing noise"
+                },
+                "erode": {
+                    "active": true,
+                    "method": "erode",
+                    "args": [
+                        {"item": [ [1,1,1],[1,1,1],[1,1,1] ], "__type__": "np.array"}
+                    ],
+                    "kwargs": { "iterations": 1 }
+                },
+                "dilate": {
+                    "active": true,
+                    "method": "dilate",
+                    "args": [
+                        {"item": [ [1,1,1],[1,1,1],[1,1,1] ], "__type__": "np.array"}
+                    ],
+                    "kwargs": { "iterations": 1 }
+                },
+                "inRange": {
+                    "active": false,
+                    "method": "inRange",
+                    "args": [
+                        {"item": [0, 72, 0], "__type__": "tuple"},
+                        {"item": [255, 255, 115], "__type__": "tuple"}
+                    ]
+                }
+            },
+            "show": false
+        },
+        "dots_old": {
+            "methods": {
+                "cvtColor": {
+                    "active": false,
+                    "method": "cvtColor",
+                    "args": [
+                        {"item": "cv2.COLOR_BGR2GRAY", "__type__": "constant"}
+                    ]
+                },
+                "GaussianBlur": {
+                    "active": false,
+                    "method": "GaussianBlur",
+                    "args": [
+                        {"item": [5,5], "__type__": "tuple"}, 0
+                    ],
+                    "__comment__": "apply GuassianBlur to reduce noise"
+                },
+                "medianBlur": {
+                    "active": false,
+                    "method": "medianBlur",
+                    "args": [ 5 ],
+                    "__comment__": "medianBlur is also added for smoothening, reducing noise"
+                },
+                "erode": {
+                    "active": false,
+                    "method": "erode",
+                    "args": [
+                        {"item": [ [1,1,1],[1,1,1],[1,1,1] ], "__type__": "np.array"}
+                    ],
+                    "kwargs": { "iterations": 1 }
+                },
+                "dilate": {
+                    "active": false,
+                    "method": "dilate",
+                    "args": [
+                        {"item": [ [1,1,1],[1,1,1],[1,1,1] ], "__type__": "np.array"}
+                    ],
+                    "kwargs": { "iterations": 1 }
+                },
+                "inRange": {
+                    "active": true,
+                    "method": "inRange",
+                    "args": [
+                        {"item": [0, 80, 0], "__type__": "tuple"},
+                        {"item": [255, 255, 255], "__type__": "tuple"}
+                    ],
+                    "__comment__": "paint white all that is between"
+                },
+                "minCircle": {
+                    "active": true,
+                    "method": "circle",
+                    "args": [
+                        {"item": [3, 3], "__type__": "tuple"},
+                        2,
+                        {"item": [0, 0, 0], "__type__": "tuple"},
+                        {"item": "cv2.FILLED", "__type__": "constant"}
+                    ],
+                    "__comment__": "drawing minimal circle"
+                },
+                "maxCircle": {
+                    "active": true,
+                    "method": "circle",
+                    "args": [
+                        {"item": [30, 15], "__type__": "tuple"},
+                        15,
+                        {"item": [0, 0, 0], "__type__": "tuple"},
+                        {"item": "cv2.FILLED", "__type__": "constant"}
+                    ],
+                    "__comment__": "drawing maximal circle"
+                }
+            },
+            "filters": {
+                "contourArea": {
+                    "active": true,
+                    "method": "contourArea",
+                    "expression": "1 < np.sqrt({0}/np.pi) < 15",
+                    "__comment__": "filtering the dots by radius"
+                }
+            },
+            "show": false
+        },
+        "dots": {
+            // change to true to display the image (takes a moment to appear)
+            "show": true,
+            "methods": {
+                "cvtColor": {
+                    "active": false,
+                    "method": "cvtColor",
+                    "args": [
+                        {"item": "cv2.COLOR_BGR2HSV", "__type__": "constant"}
+                    ]
+                },
+                "medianBlur": {
+                    "active": false,
+                    "method": "medianBlur",
+                    "args": [ 1 ],
+                    "__comment__": "Invert image"
+                },
+                // This filter is important to filter out the circle from the picture
+                // Tune the second value of the lower argument and see the results in
+                // the picture. You have to set dots.show = true, such that the processed
+                // image is displayed.
+                "inRange": {
+                    "active": true,
+                    "method": "inRange",
+                    "args": [
+                        // these values are given in RGB
+                        {"item": [0, 70, 0], "__type__": "tuple"}, // lower
+                        {"item": [255, 255, 255], "__type__": "tuple"} // upper
+                    ],
+                    "__comment__": "paint white all that is between the RGB values above"
+                },
+                "morphologyEx": {
+                    "active": false,
+                    "method": "morphologyEx",
+                    "args": [
+                        {"item": "cv2.MORPH_CLOSE", "__type__": "constant"},
+                        {"item": "np.ones((5,5),np.uint8)", "__type__": "expression"}
+                    ],
+                    "kwargs": {
+                        "iterations": 2
+                    },
+                    "__comment__": "Dilation followed by Erosion"
+                },
+                "dilate": {
+                    "active": false,
+                    "method": "dilate",
+                    "args": [
+                        {"item": "np.array([[1,1,1],[1,1,1],[1,1,1]],dtype=np.uint8)", "__type__": "expression"}
+                    ],
+                    "kwargs": {
+                        "iterations": 1
+                    },
+                    "__comment__": "Dilation"
+                },
+                "bitwise_not": {
+                    "active": false,
+                    "method": "bitwise_not",
+                    "args": [],
+                    "__comment__": "Invert the image"
+                }
+            },
+            "filters": {
+                // filtering the dots by radius
+                // the method contourArea is call with the dot as argument
+                // in the expression below the result in put into the {0}
+                // placeholder. This is done for every recognized dot in
+                // the list. All dots that are recognized are drawn red in
+                // the resulting picture.
+                "contourArea": {
+                    "active": true,
+                    "method": "contourArea",
+                    "expression": "1 < np.sqrt({0}/np.pi) < 15",
+                    "__comment__": "filtering the dots by radius"
+                }
+            }
+        },
+        "original": { "show": false },
+        "output": {
+            "show": true,
+            "store": "web/output.jpg"
+        }
+    },
+    "config": {
+         // enable fancy output in the terminal
+        "fancy": true,
+
+        // calculate pi by the area covered by the points rather than the number of distict #points
+        "area": true,
+
+        // delay after each cycle in seconds
+        "delay": 2,
+
+        // enable debugging (prints a lot of messages to stdout).
+        "debug": false,
+
+        // no more that max_circles circles are processed
+        "max_circles": 2,
+
+        // possible values: draw, detect
+        // All circles that are detected or drawn are visible in the output
+        // picture in green. Each circles gets an orange rectangle around.
+        "circle": ["draw"],
+
+        // Draw circles (x,y,radius) in pixels
+        "draw_circles": [[
+            [320, 240, 220] // (x, y, r)
+        ]],
+
+        // Parameter for the call of cv2.HoughCircles() to detect circles automatically
+        "detect_circles": {
+            "args": [
+                {"item": "cv2.HOUGH_GRADIENT", "__type__": "constant"}, 1, 200
+            ],
+            "kwargs": {
+                "param1": 30,
+                "param2": 45, // the smaller, the more false circles may be detected
+                "minRadius": 50, // detect only circles with this minimal radius in pixels (the resolution is 640x480)
+                "maxRadius": 480 // maximal radius
+            },
+        },
+
+        // Parameter for the call of cv2.findContours() to detect contours automatically
+        "detect_dots": {
+            "args": [
+                {"item": "cv2.RETR_LIST", "__type__": "constant"},
+                {"item": "cv2.CHAIN_APPROX_SIMPLE", "__type__": "constant"}
+            ],
+            "kwargs": {},
+        }
+    }
+}
