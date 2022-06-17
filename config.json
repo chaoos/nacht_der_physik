@@ -247,6 +247,9 @@
         // no more that max_circles circles are processed
         "max_circles": 2,
 
+        // how many values of pi to keep
+        "keep": 50,
+
         // possible values: draw, detect
         // All circles that are detected or drawn are visible in the output
         // picture in green. Each circles gets an orange rectangle around.

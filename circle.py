@@ -108,7 +108,7 @@ if __name__ == "__main__":
     image = {}
     cap = cv2.VideoCapture(args.url) # Set Capture Device, in case of a USB Webcam try 1, or give -1 to get a list of available devices
 
-    store_size = 50
+    store_size = data.config.keep
     store = {
         'timestamp': deque(maxlen = store_size),
         'pi_area': deque(maxlen = store_size),
@@ -316,6 +316,14 @@ if __name__ == "__main__":
                     data = commentjson.load(f, object_hook=hinted_hook)
                     data = argparse.Namespace(**data)
                     data.config = argparse.Namespace(**data.config)
+                    if store_size != data.config.keep:
+                        logger.info(f"Changing store_size from {store_size} to {data.config.keep}")
+                        store_size = data.config.keep
+                        for el in ['timestamp', 'pi_area', 'pi_pts', 'pts_in_rect', 'pts_in_circ', 'area_in_rect', 'area_in_circ']:
+                            intermediate = store[el]
+                            store[el] = deque(maxlen = store_size)
+                            store[el].extend(intermediate)
+
                     logger.info("Reload config successful")
                     logger.setLevel(logging.DEBUG if data.config.debug else logging.INFO)
                     mtime = os.path.getmtime(args.config)

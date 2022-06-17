@@ -244,6 +244,9 @@
         // enable debugging (prints a lot of messages to stdout).
         "debug": true,
 
+        // how many values of pi to keep
+        "keep": 50,
+
         // no more that max_circles circles are processed
         "max_circles": 2,
 
