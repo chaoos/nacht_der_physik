@@ -37,6 +37,7 @@ and check whether the picture and number change accordingly
 
 9 circles:
 
+```json
     "max_circles": 9,
     "circle": ["draw"],
     "draw_circles": [[
@@ -50,17 +51,21 @@ and check whether the picture and number change accordingly
         [320, 100, 70],
         [460, 100, 70]
     ]],
+```
 
 1 circle:
 
+```json
     "max_circles": 1,
     "circle": ["draw"],
     "draw_circles": [[
         [320, 240, 220] // (x, y, r)
     ]],
+```
 
 16 circles:
 
+```json
     "max_circles": 16,
     "circle": ["draw"],
     "draw_circles": [[
@@ -81,11 +86,13 @@ and check whether the picture and number change accordingly
         [375, 75, 55],
         [485, 75, 55]
     ]],
+```
 
 ## Draw dots
 
 draw 1000 dots uniformly (in /config)
 
+```json
     "max_dots": 1000,
     "dots": ["detect"],
     "draw_dots": {
@@ -98,9 +105,11 @@ draw 1000 dots uniformly (in /config)
             "dtype": {"item": "int", "__type__": "constant"}
         }
     },
+```
 
 ## detect circles (in /config)
 
+```json
     "circle": ["detect"],
     "detect_circles": {
         "args": [
@@ -113,9 +122,11 @@ draw 1000 dots uniformly (in /config)
             "maxRadius": 480
         },
     },
+```
 
 ## detect dots (in /config)
 
+```json
     "dots": ["detect"],
     "detect_dots": {
         "args": [
@@ -124,9 +135,11 @@ draw 1000 dots uniformly (in /config)
         ],
         "kwargs": {},
     },
+```
 
 ## filter detected dots by area (in /images/dots)
 
+```json
     "filters": {
         // filtering the dots by radius
         // the method contourArea is call with the dot as argument
@@ -141,6 +154,7 @@ draw 1000 dots uniformly (in /config)
             "__comment__": "filtering the dots by radius"
         }
     }
+```
 
 ---
 
@@ -148,17 +162,23 @@ draw 1000 dots uniformly (in /config)
 
 original call to HoughCircles():
 
+```python
     detect_circles = cv2.HoughCircles(image['circle'], cv2.HOUGH_GRADIENT, 1, 200,
         param1 = 30,
         param2 = 45, # the smaller, the more false circles may be detected
         minRadius = 50,
         maxRadius = 480
     )
+```
 
 original call to findContours():
 
+```python
     dots, hierarchy = cv2.findContours(image['dots'], cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE) # find dots
+```
 
 original call to drawContours():
 
+```python
     cv2.drawContours(image['output'], dots_in_rect, -1, dot_color, cv2.FILLED)
+```
