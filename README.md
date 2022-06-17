@@ -18,49 +18,127 @@ and check whether the picture and number change accordingly
 
 ---
 
-# Draw circles
+# Example configs
+
+## Draw circles (in /config)
 
 4 circles:
 
-    [210, 350, 110],
-    [430, 350, 110],
-    [210, 130, 110],
-    [430, 130, 110]
+    "max_circles": 4,
+    "circle": ["draw"],
+    "draw_circles": [[
+        [210, 350, 110],
+        [430, 350, 110],
+        [210, 130, 110],
+        [430, 130, 110]
+    ]],
 
 9 circles:
 
-    [180, 380, 70],
-    [320, 380, 70],
-    [460, 380, 70],
-    [180, 240, 70],
-    [320, 240, 70],
-    [460, 240, 70],
-    [180, 100, 70],
-    [320, 100, 70],
-    [460, 100, 70]
+    "max_circles": 9,
+    "circle": ["draw"],
+    "draw_circles": [[
+        [180, 380, 70],
+        [320, 380, 70],
+        [460, 380, 70],
+        [180, 240, 70],
+        [320, 240, 70],
+        [460, 240, 70],
+        [180, 100, 70],
+        [320, 100, 70],
+        [460, 100, 70]
+    ]],
 
 1 circle:
 
-    [320, 240, 220]
+    "max_circles": 1,
+    "circle": ["draw"],
+    "draw_circles": [[
+        [320, 240, 220] // (x, y, r)
+    ]],
 
 16 circles:
 
-    [155, 405, 55],
-    [265, 405, 55],
-    [375, 405, 55],
-    [485, 405, 55],
-    [155, 295, 55],
-    [265, 295, 55],
-    [375, 295, 55],
-    [485, 295, 55],
-    [155, 185, 55],
-    [265, 185, 55],
-    [375, 185, 55],
-    [485, 185, 55],
-    [155, 75, 55],
-    [265, 75, 55],
-    [375, 75, 55],
-    [485, 75, 55]
+    "max_circles": 16,
+    "circle": ["draw"],
+    "draw_circles": [[
+        [155, 405, 55],
+        [265, 405, 55],
+        [375, 405, 55],
+        [485, 405, 55],
+        [155, 295, 55],
+        [265, 295, 55],
+        [375, 295, 55],
+        [485, 295, 55],
+        [155, 185, 55],
+        [265, 185, 55],
+        [375, 185, 55],
+        [485, 185, 55],
+        [155, 75, 55],
+        [265, 75, 55],
+        [375, 75, 55],
+        [485, 75, 55]
+    ]],
+
+## Draw dots
+
+draw 1000 dots uniformly (in /config)
+
+    "max_dots": 1000,
+    "dots": ["detect"],
+    "draw_dots": {
+        "method": "np.random.randint",
+        "args": [],
+        "kwargs": {
+            "low": 0,
+            "high": 640,
+            "size": {"item": [1000,1,1,2], "__type__": "tuple"},
+            "dtype": {"item": "int", "__type__": "constant"}
+        }
+    },
+
+## detect circles (in /config)
+
+    "circle": ["detect"],
+    "detect_circles": {
+        "args": [
+            {"item": "cv2.HOUGH_GRADIENT", "__type__": "constant"}, 1, 200
+        ],
+        "kwargs": {
+            "param1": 30,
+            "param2": 45,
+            "minRadius": 50,
+            "maxRadius": 480
+        },
+    },
+
+## detect dots (in /config)
+
+    "dots": ["detect"],
+    "detect_dots": {
+        "args": [
+            {"item": "cv2.RETR_LIST", "__type__": "constant"},
+            {"item": "cv2.CHAIN_APPROX_SIMPLE", "__type__": "constant"}
+        ],
+        "kwargs": {},
+    },
+
+## filter detected dots by area (in /images/dots)
+
+    "filters": {
+        // filtering the dots by radius
+        // the method contourArea is call with the dot as argument
+        // in the expression below the result in put into the {0}
+        // placeholder. This is done for every recognized dot in
+        // the list. All dots that are recognized are drawn red in
+        // the resulting picture.
+        "contourArea": {
+            "active": false,
+            "method": "contourArea",
+            "expression": "1 < np.sqrt({0}/np.pi) < 15",
+            "__comment__": "filtering the dots by radius"
+        }
+    }
 
 ---
 
