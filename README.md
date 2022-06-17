@@ -24,6 +24,7 @@ and check whether the picture and number change accordingly
 
 4 circles:
 
+```json
     "max_circles": 4,
     "circle": ["draw"],
     "draw_circles": [[
@@ -32,6 +33,7 @@ and check whether the picture and number change accordingly
         [210, 130, 110],
         [430, 130, 110]
     ]],
+```
 
 9 circles:
 
